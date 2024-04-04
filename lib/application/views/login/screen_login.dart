@@ -5,6 +5,8 @@ import 'package:codeland/application/views/login/widgets/underlined_text.dart';
 import 'package:codeland/application/widgets/submibutton_widget.dart';
 import 'package:codeland/core/constants/constant_color.dart';
 import 'package:codeland/core/constants/constant_size.dart';
+import 'package:codeland/data/model/login/login_model.dart';
+import 'package:codeland/data/service/loginservice.dart';
 import 'package:flutter/material.dart';
 
 class ScreenLogin extends StatelessWidget {
@@ -63,9 +65,7 @@ class ScreenLogin extends StatelessWidget {
                 buttonName: "Login",
                 buttonPress: () {
                   if (_key.currentState!.validate()) {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => ScreenHome(),
-                    ));
+                    verifyLogin(context);
                   }
                 },
               ),
@@ -104,5 +104,52 @@ class ScreenLogin extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void verifyLogin(BuildContext context) async {
+    String userName = _userNameController.text;
+    String password = _passwordController.text;
+
+    try {
+      // Call the login service
+      LoginResponse response = await LoginService.login(userName, password);
+
+      // Check if login was successful
+      if (response.statusCode == 200 || response.statusCode == 202) {
+        Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(
+            builder: (context) => ScreenHome(),
+          ),
+        );
+
+        // Show success message
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Login Successful!"),
+          ),
+        );
+      } else {
+        // Show error message if login fails
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Invalid username or password! Please try again."),
+          ),
+        );
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print("Error during login: $e");
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Invalid username or password! Please try again")));
+      // Handle error, show error message, etc.
+    }
   }
 }
