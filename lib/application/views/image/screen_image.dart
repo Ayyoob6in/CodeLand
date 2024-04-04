@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:codeland/core/constants/constant_color.dart';
+import 'package:codeland/core/constants/constant_size.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -12,18 +13,28 @@ class ScreenImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: appColor,
-        title: Text("IMAGE VIEWER"),
-      ),
-      body: Container(
-        height: double.maxFinite,
-        width: double.infinity,
-        child: Image.file(
-          File(image.first.path),
-          fit: BoxFit.cover,
+        appBar: AppBar(
+          backgroundColor: appColor,
+          iconTheme: const IconThemeData(color: fWhite),
+          title: const Text(
+            "IMAGE VIEWER",
+            style: TextStyle(
+                color: fWhite, fontWeight: FontWeight.w500, fontSize: 20),
+          ),
         ),
-      ),
-    );
+        body: PageView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: image.length,
+            itemBuilder: (context, index) {
+              var images = image[index];
+              return SizedBox(
+                height: double.maxFinite,
+                width: double.infinity,
+                child: Image.file(
+                  File(images.path),
+                  fit: BoxFit.cover,
+                ),
+              );
+            }));
   }
 }
